@@ -78,6 +78,41 @@ avplay  →  <video>  →  <img>
 If playback fails, it retries after 2/5/15/30 seconds. The screen saver is
 disabled automatically while media is playing.
 
+Backgrounds
+The filename must begin with bg — the filter is /^bg\d*\./i. Everything else about the name is free: bg.mp4, bg2.mp4, bg10.mp4 and bg-party.mp4 are all picked up.
+
+Accepted	Notes
+Images	jpg, jpeg, png, webp	Still-image background
+Videos	mp4	Played with avplay, then <video>
+How to add one
+
+Put the file in the project root, next to index.html — for example bg6.mp4.
+Build Project and Run Project as usual.
+Open Settings on the TV: Photo selection or Video selection lists the new file, and ← / → cycles through it. OK saves.
+Numbering does not have to be contiguous. The list is ordered by the number in the name — plain bg sorts first, then bg2, bg3 and so on — not alphabetically, so bg10.mp4 correctly comes after bg5.mp4. A name with no number, such as bg-party.mp4, is treated as bg2 and therefore sits alongside it.
+
+Naming is the whole rule. A file called holiday.mp4 is ignored silently: no error, it just does not appear in the list. If a file you added is missing, check that it starts with bg.
+
+Size matters. Backgrounds are packaged into the .wgt and pushed over the network on every install. The shipped backgrounds total about 15 MB (20 MB including the music); adding a large 1080p clip adds its full size to the package and to install time.
+
+Video backgrounds also need the codec to be H.264 (avc1) with yuv420p pixel format, which is what the Tizen video pipeline expects. Anything else may show the still-image fallback instead.
+
+Music
+Any file whose name starts with music is picked up, and the Music selection row in Settings lists the tracks.
+
+Accepted
+Audio	mp3, m4a, aac, ogg, wav
+How to add one
+
+Put the file in the project root, next to index.html — for example music2.mp3.
+Build Project and Run Project.
+Open Settings → Music selection and use ← / → to choose the track. OK saves.
+Unlike backgrounds there is no numeric naming rule; tracks are ordered by name, with numbers compared numerically so music2 comes before music10. Naming still matters — a file called song.mp3 is ignored silently and never appears in the list.
+
+Switching tracks mid-song keeps playing and resumes at roughly the same position. The chosen track is stored in localStorage and restored on the next launch.
+
+Size matters. Backgrounds and music are packaged into the .wgt and pushed over the network on every install. The shipped media totals about 20 MB, so extra files add their full size to the package and to install time. Audio is already compressed; re-encoding usually saves little.
+
 ### Performance
 
 `PERFORMANCE` constants: clock 60 s, system 30 s, sources 2 min, storage
