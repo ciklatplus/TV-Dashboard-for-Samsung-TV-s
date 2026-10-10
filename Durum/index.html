@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>TV Dashboard</title>
+
+  <link rel="stylesheet" href="style.css?v=1.12.6" />
+
+  <!-- Samsung TV Product API -->
+  <script type="text/javascript" src="$WEBAPIS/webapis/webapis.js"></script>
+</head>
+
+<body>
+  <!-- bg.mp4 oynatılabiliyorsa video, aksi durumda bg.jpg arka planı kullanılır. -->
+  <img id="bgImage" class="bgMedia" alt="" />
+  <video id="bgVideo" class="bgMedia" muted autoplay loop playsinline preload="metadata" hidden></video>
+  <object id="bgAvplay" class="bgMedia" type="application/avplayer" hidden></object>
+  
+
+  <!-- Samsung TV için kapak görseli içermeyen, saf MP3 ses akışı. -->
+  <audio id="bgMusic" src="music-tv.mp3" preload="metadata" loop></audio>
+
+  <main class="screen">
+    <div id="alertBanner" class="alertBanner" hidden>
+      <span id="alertText" data-i18n="warning">Uyarı</span>
+    </div>
+
+    <header class="topbar">
+      <div class="timeArea">
+        <div id="clock">--:--</div>
+        <div id="date">Yükleniyor...</div>
+      </div>
+
+      <div class="weatherBlock">
+        <div id="weatherTemp">--°</div>
+        <div id="weatherText">Hava durumu alınıyor...</div>
+        <div class="forecastStrip">
+          <span id="forecast0">--:-- --°</span>
+          <span id="forecast1">--:-- --°</span>
+          <span id="forecast2">--:-- --°</span>
+        </div>
+        <div id="sunInfo" class="sunInfo">Gün doğumu / batımı alınıyor...</div>
+      </div>
+    </header>
+
+    <section class="dashboard">
+      <div class="infoColumn infoColumnLeft">
+        <div class="card glass" tabindex="0">
+          <div>
+            <div class="miniLabel" data-i18n="modelInfo">TV Model Info</div>
+            <div id="model" class="value">Algılanıyor...</div>
+          </div>
+          <div id="modelCode" class="subValue">Model kodu okunuyor...</div>
+        </div>
+
+        <div class="card plainInfo" tabindex="0">
+          <div class="miniLabel" data-i18n="system">Sistem</div>
+          <div id="platform" class="value">Tizen okunuyor...</div>
+          <div id="firmware" class="subValue">Firmware okunuyor...</div>
+          <div id="systemExtra" class="microValue">Mimari ve build okunuyor...</div>
+        </div>
+
+        <div class="card glass resourceCard" tabindex="0">
+          <div class="resourceHeading">
+            <div class="miniLabel" data-i18n="resources">Sistem Kaynakları</div>
+            <strong id="healthStatus" class="ok">Kontrol ediliyor</strong>
+          </div>
+          <div id="healthDetail" class="microValue">Sistem sağlığı hesaplanıyor...</div>
+
+          <div class="metricRow">
+            <div class="metricHeader">
+              <span data-i18n="cpuUsage">CPU kullanımı</span>
+              <strong id="cpuValue">--%</strong>
+            </div>
+            <div class="metricTrack"><span id="cpuBar" class="metricFill"></span></div>
+            <canvas id="cpuGraph" class="metricGraph" width="342" height="24"></canvas>
+          </div>
+
+          <div class="metricRow">
+            <div class="metricHeader">
+              <span>RAM</span>
+              <strong id="ramValue">Okunuyor...</strong>
+            </div>
+            <div class="metricTrack"><span id="ramBar" class="metricFill"></span></div>
+            <canvas id="ramGraph" class="metricGraph" width="342" height="24"></canvas>
+          </div>
+
+          <div class="metricRow">
+            <div class="metricHeader">
+              <span data-i18n="internalStorage">Dahili depolama</span>
+              <strong id="storageValue">Okunuyor...</strong>
+            </div>
+            <div class="metricTrack"><span id="storageBar" class="metricFill"></span></div>
+          </div>
+
+          <div id="usbStorage" class="microValue">USB depolama aranıyor...</div>
+        </div>
+
+        <div class="card plainInfo" tabindex="0">
+          <div class="miniLabel" data-i18n="panel">Panel</div>
+          <div id="panel" class="value">Algılanıyor...</div>
+          <div id="resolution" class="subValue">Çözünürlük okunuyor...</div>
+          <div id="brightness" class="microValue">Parlaklık okunuyor...</div>
+          <div id="displayFeatures" class="microValue">HDR / enerji bilgisi okunuyor...</div>
+          <div id="hardwareInfoLine" class="hardwareValues" hidden>
+            <span id="boardTemperature">Sıcaklık: --°C</span>
+            <span id="remoteBattery">Kumanda: --%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="infoColumn infoColumnRight">
+        <div class="card glass networkCard" tabindex="0">
+          <div>
+            <div class="miniLabel" data-i18n="networkInternet">Ağ / İnternet</div>
+            <div id="network" class="value">Kontrol ediliyor...</div>
+            <div id="networkDetail" class="subValue">Bağlantı türü okunuyor...</div>
+            <div id="wifiSignal" class="microValue">Wi‑Fi sinyali okunuyor...</div>
+            <div class="speedTestBox">
+              <div class="speedTestHeader">
+                <span data-i18n="manualInternetTest">Manuel internet testi</span>
+                <strong id="speedTestStatus">OK: başlat</strong>
+              </div>
+              <div class="speedTestTrack"><span id="speedTestBar"></span></div>
+            </div>
+          </div>
+          <div class="inlineDetail">
+            <span data-i18n="tvIp">TV IP</span>
+            <strong id="ip">Alınıyor...</strong>
+          </div>
+        </div>
+
+        <div class="card plainInfo sourceInfo" tabindex="0">
+          <div class="miniLabel" data-i18n="source">TV / HDMI Kaynağı</div>
+          <div id="activeSource" class="value">Algılanıyor...</div>
+          <div id="sourceDetail" class="subValue">Bağlı girişler okunuyor...</div>
+        </div>
+
+        <div class="card plainInfo soundCard" tabindex="0">
+          <div class="miniLabel" data-i18n="sound">Ses</div>
+          <div id="volume" class="value">--%</div>
+          <div id="mute" class="subValue">Sessiz mod kontrol ediliyor...</div>
+        </div>
+
+        <div class="card glass musicCard" tabindex="0">
+          <div>
+            <div class="miniLabel" data-i18n="music">Müzik</div>
+            <div id="musicStatus" class="value">Hazır</div>
+          </div>
+          <div id="musicTitle" class="microValue">Windows XP Installation Music</div>
+          <div class="musicProgress"><span id="musicProgressBar"></span></div>
+          <div id="musicTime" class="musicTime">0:00 / 0:00</div>
+          <div id="musicDetail" class="subValue">OK: oynat / duraklat</div>
+        </div>
+
+        <div class="card glass locationInfo" tabindex="0">
+          <div class="miniLabel" data-i18n="location">Konum</div>
+          <div id="city" class="value">IP konumu algılanıyor...</div>
+          <div id="locationSource" class="subValue">IP konumu algılanıyor...</div>
+        </div>
+
+        <div class="card plainInfo settingsCard" tabindex="0">
+          <div class="miniLabel" data-i18n="settings">Ayarlar</div>
+          <div id="settingsSummary" class="value">Video • bg.mp4</div>
+          <div id="settingsDetail" class="subValue">Müzik %35 • OK: ayarları aç</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <span id="footerText">TV Dashboard hazır</span>
+      <span><span id="appVersion">v1.12.6</span> • <span id="lastUpdated">Henüz yenilenmedi</span></span>
+      <span data-i18n="footerHelp">Yön tuşları: gezin • OK: seç • Geri: çıkış</span>
+    </div>
+  </main>
+
+  <div id="settingsOverlay" class="settingsOverlay" hidden>
+    <div class="settingsPanel glass">
+      <div class="settingsTitle" data-i18n="dashboardSettings">Dashboard Ayarları</div>
+      <div id="settingVolume" class="settingRow activeSetting">
+        <span data-i18n="musicLevel">Müzik seviyesi</span>
+        <strong id="settingVolumeValue">%35</strong>
+      </div>
+      <div id="settingRefresh" class="settingRow">
+        <span data-i18n="weatherRefresh">Hava yenileme</span>
+        <strong id="settingRefreshValue">10 dakika</strong>
+      </div>
+      <div id="settingBackgroundMode" class="settingRow">
+        <span data-i18n="backgroundMode">Arka plan modu</span>
+        <strong id="settingBackgroundModeValue">Video</strong>
+      </div>
+      <div id="settingBackgroundImage" class="settingRow">
+        <span data-i18n="backgroundPhoto">Foto seçimi</span>
+        <strong id="settingBackgroundImageValue">bg.jpg</strong>
+      </div>
+      <div id="settingBackgroundVideo" class="settingRow">
+        <span data-i18n="backgroundVideo">Video seçimi</span>
+        <strong id="settingBackgroundVideoValue">bg.mp4</strong>
+      </div>
+      <div id="settingLanguage" class="settingRow">
+        <span data-i18n="language">Dil</span>
+        <strong id="settingLanguageValue">Türkçe</strong>
+      </div>
+      <div class="settingsHint" data-i18n="settingsHint">↑↓ alan seç • ←→ değiştir • OK kaydet</div>
+    </div>
+  </div>
+
+  
+
+  <div id="languageOverlay" class="languageOverlay">
+    <div class="languagePanel glass" role="dialog" aria-modal="true" aria-labelledby="languageTitle">
+      <div id="languageTitle" class="languageTitle">Dil seçin / Choose language</div>
+      <div class="languageSubtitle">Devam etmek için bir dil seçin<br />Choose a language to continue</div>
+      <div class="languageChoices">
+        <button id="languageTr" class="languageChoice activeLanguage" type="button" data-language="tr">
+          <strong>Türkçe</strong><span>TR</span>
+        </button>
+        <button id="languageEn" class="languageChoice" type="button" data-language="en">
+          <strong>English</strong><span>EN</span>
+        </button>
+      </div>
+      <div class="languageHint">← → seç / choose • OK onayla / confirm</div>
+    </div>
+  </div>
+
+  <script src="main.js?v=1.12.6"></script>
+</body>
+</html>

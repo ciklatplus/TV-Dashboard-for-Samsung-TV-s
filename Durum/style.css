@@ -1,0 +1,864 @@
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  background: #080b14;
+  transition: none;
+}
+
+.bgMedia {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 1;
+  transform: scale(1.01);
+  pointer-events: none;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.10), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(120, 170, 255, 0.12), transparent 32%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.06));
+}
+
+body.time-night::before {
+  background:
+    radial-gradient(circle at top left, rgba(80, 120, 220, 0.10), transparent 30%),
+    linear-gradient(135deg, rgba(3, 7, 18, 0.54), rgba(5, 9, 20, 0.22));
+}
+
+body.weather-rain::before,
+body.weather-snow::before {
+  background:
+    radial-gradient(circle at bottom right, rgba(90, 145, 220, 0.18), transparent 35%),
+    linear-gradient(135deg, rgba(4, 12, 24, 0.46), rgba(15, 30, 48, 0.14));
+}
+
+body.weather-clear:not(.time-night)::before {
+  background:
+    radial-gradient(circle at top right, rgba(255, 205, 120, 0.13), transparent 34%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.04));
+}
+
+.screen {
+  position: relative;
+  z-index: 2;
+  width: 100vw;
+  height: 100vh;
+  padding: 40px 56px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: none;
+}
+
+.alertBanner {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  z-index: 8;
+  max-width: 620px;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 232, 163, 0.55);
+  border-radius: 18px;
+  background: rgba(45, 32, 8, 0.82);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
+  transform: translateX(-50%);
+  text-align: center;
+  font-size: 13px;
+  color: #ffe8a3;
+}
+
+.alertBanner.criticalAlert {
+  border-color: rgba(255, 180, 180, 0.62);
+  background: rgba(55, 12, 15, 0.86);
+  color: #ffb4b4;
+}
+
+/* Temel cam yuzey. Tum kartlar, paneller ve butonlar bu malzemeyi paylasir.
+   Tek kaynak: --glass-bg / --glass-border / --glass-blur degiskenleri. */
+.glass {
+  background: rgba(14, 17, 25, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.topbar {
+  flex: 0 0 108px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  animation: none;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+}
+
+.timeArea {
+  min-width: 300px;
+}
+
+#clock {
+  font-size: 58px;
+  font-weight: 600;
+  letter-spacing: -4px;
+  line-height: 0.95;
+  text-shadow: 0 12px 42px rgba(0, 0, 0, 0.35);
+}
+
+#date {
+  margin-top: 7px;
+  font-size: 18px;
+  font-weight: 400;
+  opacity: 0.88;
+}
+
+.weatherBlock {
+  text-align: right;
+  max-width: 520px;
+}
+
+#weatherTemp {
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -4px;
+  line-height: 1;
+  text-shadow: 0 12px 42px rgba(0, 0, 0, 0.30);
+}
+
+#weatherText {
+  margin-top: 5px;
+  font-size: 17px;
+  opacity: 0.9;
+}
+
+.forecastStrip {
+  margin-top: 9px;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 12px;
+  opacity: 0.82;
+}
+
+.forecastStrip span + span {
+  margin-left: 15px;
+}
+
+.sunInfo {
+  margin-top: 5px;
+  font-size: 10px;
+  opacity: 0.65;
+}
+
+.dashboard {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 0 24px;
+}
+
+.infoColumn {
+  width: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.infoColumnRight {
+  text-align: right;
+}
+.card {
+  min-height: 112px;
+  border-radius: 20px;
+  padding: 17px 19px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  outline: none;
+  transform: translateY(0) scale(1);
+  transition: none;
+  animation: none;
+  /* Saydam yuzey uzerinde metin okunabilirligi icin yumusak golge. */
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+.card + .card {
+  margin-top: 10px;
+}
+
+/* Saydam kartlar da cam yuzey kullanir; sadece .glass'tan daha ince.
+   Boylece tum kartlar ayni malzeme dilini paylasir.
+   DIKKAT: bu kural :focus kurallarindan ONCE gelmemeli; ayni specificity'de
+   sonraki kural kazanir ve odaklanma efekti ezilir. */
+.plainInfo {
+  min-height: 84px;
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(14, 17, 25, 0.30);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.55);
+}
+
+.resourceCard {
+  min-height: 264px;
+}
+
+.resourceHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.resourceHeading .miniLabel {
+  margin-bottom: 0;
+}
+
+.resourceHeading strong {
+  margin-left: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.metricRow {
+  margin-top: 9px;
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.metricHeader strong {
+  margin-left: 14px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metricTrack {
+  height: 5px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.metricGraph {
+  display: none;
+  width: 100%;
+  height: 24px;
+  margin-top: 3px;
+  opacity: 0.78;
+}
+
+.metricFill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8ed9ff, #b9ffcf);
+  transition: none;
+}
+
+.metricFill.warnFill {
+  background: linear-gradient(90deg, #ffd37a, #ffe8a3);
+}
+
+.metricFill.badFill {
+  background: linear-gradient(90deg, #ff8f8f, #ffb4b4);
+}
+
+.microValue {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.hardwareValues {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-start;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b9ffcf;
+}
+
+.hardwareValues span + span {
+  margin-left: 16px;
+}
+
+.infoColumnRight .plainInfo {
+  min-height: 70px;
+}
+
+.musicCard {
+  min-height: 148px;
+}
+
+.musicProgress {
+  height: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.musicProgress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: #b9ffcf;
+  transition: none;
+}
+
+.musicTime {
+  margin-top: 4px;
+  font-size: 10px;
+  opacity: 0.62;
+}
+
+.inlineDetail {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: 0.76;
+}
+
+.inlineDetail strong {
+  margin-left: 12px;
+  font-weight: 500;
+}
+
+.speedTestBox {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.speedTestHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.speedTestHeader strong {
+  margin-left: 12px;
+  color: #b9ffcf;
+  font-weight: 600;
+}
+
+.speedTestTrack {
+  height: 3px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.speedTestTrack span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: #8ed9ff;
+  transition: none;
+}
+
+.card:nth-child(1) { animation-delay: 60ms; }
+.card:nth-child(2) { animation-delay: 100ms; }
+.card:nth-child(3) { animation-delay: 140ms; }
+.card:nth-child(4) { animation-delay: 180ms; }
+.card:nth-child(5) { animation-delay: 220ms; }
+.card:nth-child(6) { animation-delay: 260ms; }
+.card:nth-child(7) { animation-delay: 300ms; }
+.card:nth-child(8) { animation-delay: 340ms; }
+
+/* Odaklanan kart ayni cam yuzeyi korur, yalnizca biraz daha isiklanir ve
+   kenarligi belirginlesir. Beyaz katman okunabilirligi bozmamasi icin dusuk
+   tutulur.
+
+   DIKKAT: specificity artirildi (kart + durum). Aksi halde kaynak sirasi
+   belirleyici olur ve .plainInfo kurali odaklanma efektini ezer.
+   .card:focus -> (0,2,0) ; .card.plainInfo:focus -> (0,3,0) */
+
+.card:focus,
+.card:hover {
+  transform: none;
+  background: rgba(30, 36, 50, 0.62);
+  border-color: rgba(255, 255, 255, 0.42);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+/* Ince kart odaklaninca daha az isiklanir; agir durmasin. */
+.card.plainInfo:focus,
+.card.plainInfo:hover {
+  background: rgba(22, 27, 38, 0.46);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+}
+
+.card.musicCard:focus,
+.card.musicCard:hover {
+  background: rgba(34, 40, 56, 0.64);
+}
+
+.miniLabel {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.72;
+  margin-bottom: 6px;
+}
+
+.value {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.15;
+  word-break: break-word;
+}
+
+.subValue {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.72;
+  line-height: 1.25;
+}
+
+.footer {
+  flex: 0 0 28px;
+  padding: 0 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  opacity: 0.62;
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.8);
+  animation: none;
+}
+
+/* Overlay perdeleri: hepsi ayni karartma ve ayni blur. Panel, kartlarla
+   ayni cam yuzeyi tasidigi icin perde hafif tutulur; arka plan medyasi
+   panelin ardindan sisli gorunur. */
+.settingsOverlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.languageOverlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+
+/* Overlay panelleri kartlarla ayni cam yuzeyi paylasir. Arka plan medyasi
+   perdelenmis oldugu icin okunabilirlik korunur; yalnizca panel kendisi
+   kartlarla ayni seffaflikta kalir. */
+.languagePanel {
+  width: 500px;
+  padding: 34px;
+  border-radius: 26px;
+  text-align: center;
+  background: rgba(14, 17, 25, 0.46);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.languageTitle {
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.languageSubtitle {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.68;
+}
+
+.languageChoices {
+  display: flex;
+  margin-top: 28px;
+}
+
+.languageChoice + .languageChoice {
+  margin-left: 14px;
+}
+
+/* Dil butonlari da kart camini kullanir: ince yuzey + hafif blur. */
+.languageChoice {
+  flex: 1;
+  min-height: 88px;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  color: #fff;
+  background: rgba(14, 17, 25, 0.30);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font: inherit;
+  cursor: pointer;
+}
+
+.languageChoice strong,
+.languageChoice span {
+  display: block;
+}
+
+.languageChoice strong {
+  font-size: 20px;
+}
+
+.languageChoice span {
+  margin-top: 5px;
+  font-size: 11px;
+  opacity: 0.58;
+}
+
+/* Secili dil, kart odaklanmasiyla ayni mantikta isiklanir: yuzey
+   belirginlesir, kenarligi parlar. Tema disi renk kullanilmaz. */
+.languageChoice.activeLanguage,
+.languageChoice:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(30, 36, 50, 0.62);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+.languageHint {
+  margin-top: 22px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.settingsPanel {
+  width: 620px;
+  padding: 30px;
+  border-radius: 26px;
+  background: rgba(14, 17, 25, 0.46);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.settingsTitle {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.settingRow {
+  min-height: 58px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  font-size: 16px;
+}
+
+.settingRow span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.settingRow + .settingRow {
+  margin-top: 8px;
+}
+
+/* Panel yuzeyi seffaflastigi icin deger metni okunur bir tonda olmali.
+   Onceki yesil tonu temadan farkliydi. */
+.settingRow strong {
+  flex: 0 0 auto;
+  margin-left: 20px;
+  color: #bfe4ff;
+  max-width: 280px;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Secili ayar satiri kart odaklanmasiyla ayni mantikta isiklanir. */
+.activeSetting {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(30, 36, 50, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.settingsHint {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.62;
+}
+
+.ok { color: #b9ffcf; }
+.warn { color: #ffe8a3; }
+.bad { color: #ffb4b4; }
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes footerIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 0.82;
+    transform: translateY(0);
+  }
+}
+
+/* Eski TV WebKit motorları için düşük güç çizim yolu. */
+body::before,
+body.time-night::before,
+body.weather-rain::before,
+body.weather-snow::before,
+body.weather-clear:not(.time-night)::before {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.08));
+}
+
+.topbar,
+#clock,
+#weatherTemp,
+.plainInfo,
+.footer {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.68);
+}
+
+@media (max-width: 1400px) {
+  .screen {
+    padding: 18px 28px 14px;
+  }
+
+  .topbar {
+    flex-basis: 76px;
+  }
+
+  #clock {
+    font-size: 42px;
+  }
+
+  #date {
+    margin-top: 4px;
+    font-size: 14px;
+  }
+
+  #weatherTemp {
+    font-size: 34px;
+  }
+
+  #weatherText {
+    margin-top: 3px;
+    font-size: 13px;
+  }
+
+  .value {
+    font-size: 17px;
+  }
+
+  .miniLabel {
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  .subValue {
+    margin-top: 4px;
+    font-size: 10px;
+  }
+
+  .dashboard {
+    padding: 8px 0;
+  }
+
+  .infoColumn {
+    width: 280px;
+  }
+  .card {
+    min-height: 78px;
+    padding: 10px 13px;
+  }
+
+  .card + .card {
+    margin-top: 6px;
+  }
+
+  .infoColumnRight .card + .card {
+    margin-top: 4px;
+  }
+
+  .plainInfo {
+    min-height: 56px;
+    padding: 5px 3px;
+  }
+
+  .infoColumnRight .plainInfo {
+    min-height: 56px;
+  }
+
+  .resourceCard {
+    min-height: 190px;
+  }
+
+  .metricRow {
+    margin-top: 5px;
+  }
+
+  .metricGraph {
+    height: 18px;
+  }
+
+  .microValue,
+  .metricHeader,
+  .metricHeader strong {
+    font-size: 9px;
+  }
+
+  .footer {
+    flex-basis: 20px;
+    font-size: 9px;
+  }
+
+  .forecastStrip {
+    margin-top: 5px;
+    font-size: 8px;
+  }
+
+  .forecastStrip span + span {
+    margin-left: 8px;
+  }
+
+  .sunInfo {
+    margin-top: 3px;
+    font-size: 8px;
+  }
+
+  .musicCard {
+    min-height: 118px;
+  }
+
+  .speedTestBox {
+    margin-top: 6px;
+    padding-top: 5px;
+  }
+
+  .speedTestHeader {
+    font-size: 8px;
+  }
+
+  .musicTime {
+    font-size: 8px;
+  }
+
+  .settingsPanel {
+    width: 520px;
+    padding: 22px;
+  }
+  .languagePanel {
+    width: 440px;
+    padding: 26px;
+  }
+
+  .languageChoice {
+    min-height: 70px;
+  }
+
+  .settingsTitle {
+    margin-bottom: 14px;
+    font-size: 20px;
+  }
+
+  .settingRow {
+    min-height: 48px;
+    font-size: 14px;
+  }
+
+  .alertBanner {
+    top: 10px;
+    max-width: 480px;
+    padding: 7px 13px;
+    font-size: 10px;
+  }
+}
