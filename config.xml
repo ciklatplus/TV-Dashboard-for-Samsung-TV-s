@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets"
+        xmlns:tizen="http://tizen.org/ns/widgets"
+        id="https://example.com/tvdashboard"
+        version="1.12.6"
+        viewmodes="maximized">
+
+    <name>TV Dashboard</name>
+    <content src="index.html"/>
+    <icon src="icon.png"/>
+
+    <access origin="https://api.open-meteo.com" subdomains="false"/>
+    <access origin="https://speed.cloudflare.com" subdomains="false"/>
+    <access origin="https://get.geojs.io" subdomains="false"/>
+    <access origin="https://ipwho.is" subdomains="false"/>
+
+    <tizen:application id="TVDashApp1.TVDashboard"
+                       package="TVDashApp1"
+                       required_version="4.0"/>
+
+    <tizen:profile name="tv-samsung"/>
+    <feature name="http://tizen.org/feature/screen.size.normal.1080.1920"/>
+
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/system"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/network.public"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/productinfo"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/tvinfo"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.audio"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+
+    <tizen:metadata key="http://samsung.com/tv/metadata/use.network" value="true"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/devel.api.version" value="4.0"/>
+
+    <tizen:setting screen-orientation="landscape"
+                   context-menu="disable"
+                   background-support="disable"
+                   encryption="disable"
+                   install-location="auto"
+                   hwkey-event="enable"
+                   pointing-device-support="disable"/>
+</widget>

@@ -1,0 +1,41 @@
+# --- Tizen build ciktilari (Tizen Studio ve VS Code eklentisi) ---
+dist/
+.buildResult/
+.tizen-build-output/
+*.wgt
+*.tpk
+
+# VS Code Tizen eklentisinin urettigi yerel SDK yolu; makineye ozgudur.
+.tizen.path.config
+.vscode/
+
+# --- Samsung Tizen imza sertifikasi ve anahtarlari ---
+# BUNLAR ASLA GIT'E COMMIT EDILMEZ. dist/device-profile.xml icinde
+# gelistirici e-postası ve X.509 sertifikasi bulunur.
+*.p12
+*.pfx
+*.pem
+*.key
+*.cert
+device-profile.xml
+author-signature.xml
+signature1.xml
+*.p7b
+*.p7r
+
+# --- Gunlukler ---
+install-log.txt
+*.log
+
+# --- Kisisel kurulum yardimcilari ---
+# TV'ye kurulum artik Tizen eklentisinin Run Project komutuyla yapiliyor.
+# Bu betik yalnizca yerelde tutuluyor, repoya girmez.
+Install-TV.ps1
+
+# --- Bagimliliklar / arac onbellegi ---
+node_modules/
+.wrangler/
+.vinext/
+.next/
+.DS_Store
+Thumbs.db
