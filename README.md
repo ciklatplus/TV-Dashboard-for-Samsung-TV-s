@@ -121,8 +121,8 @@ Packaged media is scanned with `tizen.filesystem.resolve("wgt-package")`
 (`scanPackagedMedia`). Files matching the `bg` prefix are collected as
 images and videos; when the scan fails, the built-in list is used.
 
-Videos are 1920x1080 at 30 fps, H.264, audio stripped. See the commit
-history for the re-encode that reduced media size from 193 MB to 48 MB.
+If you are going to change backgrounds just get a another file rename it as the same and it works.
+Same goes for the music too.
 
 ## Development tools
 
@@ -139,13 +139,6 @@ literals passed to `setText`/`setStatus` and reports the ones missing from
 `smoke.mjs` parses `main.js`, runs `boot()`, and checks for references to
 removed functions and for element ids that no longer exist in the HTML.
 
-## Security
-
-`.gitignore` excludes the Samsung Tizen signing certificate and keys
-(`*.p12`, `*.pfx`, `*.pem`, `*.key`, `device-profile.xml`,
-`author-signature.xml`). `dist/` and `.buildResult/` are ignored too —
-`dist/device-profile.xml` contains the developer email and an X.509
-certificate.
 
 Without that certificate the app only runs on TVs with unsigned installation
 enabled; use your own certificate for Samsung Store distribution.
@@ -167,3 +160,5 @@ tools/              Maintenance and verification scripts
 
 Personal use. The Samsung Tizen SDK and the background media shown in the
 screenshot belong to their respective owners.
+
+!!I DO NOT OWN ANY ART IN THIS PROJECT IF YOU HAVE ANY OWNERSHIP OVER THESE ARTS AND IS UNCOMFORTABLE CONTACT ME VIA ciklatplus/on discord!!
